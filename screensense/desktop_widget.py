@@ -284,8 +284,8 @@ class GameSpotlightOverlay(QtWidgets.QWidget):
         self.init_hud(screen)
 
     def init_hud(self, screen):
-        # Position Quest Card near the highlight box
-        card_w, card_h = 580, 260
+        # Position Quest Card near the highlight box with generous breathing room
+        card_w, card_h = 620, 310
         # If target is on the left edge (like VS Code sidebar), place card to the right of it
         if self.bx < screen.width() // 2:
             card_x = min(self.bx + self.bw + 30, screen.width() - card_w - 30)

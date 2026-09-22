@@ -191,7 +191,7 @@ GUIDE_KNOWLEDGE_BASE: List[GuideAction] = [
         step_title="Connecting VS Code to Your GitHub Account",
         instruction="Click the 'Accounts' icon (the person silhouette) in the bottom-left corner of VS Code, and click 'Sign in with GitHub'. A browser window will open asking you to authorize.",
         highlight_target="Activity Bar: Accounts Icon (Bottom-Left) -> Sign In",
-        bounding_box_pct={"x": 0.01, "y": 0.94, "width": 0.03, "height": 0.04},
+        bounding_box_pct={"x": 0.002, "y": 0.915, "width": 0.023, "height": 0.042},
         shortcut="Ctrl + Shift + P -> Type 'GitHub: Sign In'",
         copy_text=None
     ),
@@ -229,7 +229,7 @@ GUIDE_KNOWLEDGE_BASE: List[GuideAction] = [
         step_title="Pushing Your Code to GitHub",
         instruction="In VS Code, click the Source Control icon (the branch graph) on the left sidebar and click 'Sync Changes' (or 'Push'). Or paste this command into your terminal to upload your latest commits:",
         highlight_target="Activity Bar: Source Control (Left Sidebar) -> Push",
-        bounding_box_pct={"x": 0.01, "y": 0.20, "width": 0.03, "height": 0.04},
+        bounding_box_pct={"x": 0.002, "y": 0.116, "width": 0.023, "height": 0.042},
         shortcut="Ctrl + Shift + G (Opens Source Control in VS Code)",
         copy_text="git push -u origin main"
     ),
