@@ -183,6 +183,54 @@ GUIDE_KNOWLEDGE_BASE: List[GuideAction] = [
         highlight_target="Teams Meeting Bar: Share Button",
         bounding_box_pct={"x": 0.72, "y": 0.04, "width": 0.06, "height": 0.04},
         shortcut="Ctrl + Shift + E"
+    ),
+    # --- DEVELOPER & VS CODE WORKFLOWS ---
+    GuideAction(
+        intent_keywords=["connect vs code to github", "connect vscode to github", "login to github in vs code", "sign in to github in vs code", "github in vs code", "connect github", "link github"],
+        app_context="VS Code & GitHub",
+        step_title="Connecting VS Code to Your GitHub Account",
+        instruction="Click the 'Accounts' icon (the person silhouette) in the bottom-left corner of VS Code, and click 'Sign in with GitHub'. A browser window will open asking you to authorize.",
+        highlight_target="Activity Bar: Accounts Icon (Bottom-Left) -> Sign In",
+        bounding_box_pct={"x": 0.01, "y": 0.94, "width": 0.03, "height": 0.04},
+        shortcut="Ctrl + Shift + P -> Type 'GitHub: Sign In'",
+        copy_text=None
+    ),
+    GuideAction(
+        intent_keywords=["git username", "git email", "set my git username", "configure git"],
+        app_context="Git / Terminal",
+        step_title="Setting Your Git Name and Email",
+        instruction="Paste these commands into your terminal to set your identity for commits. Safe: this does not modify or delete any files.",
+        highlight_target="Terminal: Command Prompt",
+        bounding_box_pct={"x": 0.10, "y": 0.75, "width": 0.80, "height": 0.20},
+        shortcut="Ctrl + ` (Toggles Terminal in VS Code)",
+        copy_text='git config --global user.name "Your Name" && git config --global user.email "you@example.com"'
+    ),
+    GuideAction(
+        intent_keywords=["preview markdown", "preview .md", "preview md", "markdown preview"],
+        app_context="VS Code",
+        step_title="Previewing Markdown (.md) in VS Code",
+        instruction="With your .md file open, click the split-screen 'Open Preview to the Side' icon in the top-right corner of the editor, or press Ctrl+Shift+V.",
+        highlight_target="Editor Tab Bar (Top-Right): Open Preview Icon",
+        bounding_box_pct={"x": 0.94, "y": 0.08, "width": 0.04, "height": 0.04},
+        shortcut="Ctrl + Shift + V (or Ctrl + K, V for side-by-side)"
+    ),
+    GuideAction(
+        intent_keywords=["clone repo", "clone github", "download repository", "git clone"],
+        app_context="VS Code & Git",
+        step_title="Cloning a GitHub Repository in VS Code",
+        instruction="Press Ctrl+Shift+P, type 'Git: Clone', paste your repository link (e.g., https://github.com/...), and pick a local folder to save it.",
+        highlight_target="Command Palette (Top Center)",
+        bounding_box_pct={"x": 0.25, "y": 0.02, "width": 0.50, "height": 0.06},
+        shortcut="Ctrl + Shift + P -> 'Git: Clone'"
+    ),
+    GuideAction(
+        intent_keywords=["commit message", "what should my commit message be", "suggest commit message"],
+        app_context="Git / GitHub",
+        step_title="Crafting a Clear Commit Message",
+        instruction="Write a clear, concise summary in the imperative mood. For example: 'Fix authentication error and add error handling'.",
+        highlight_target="Source Control Tab: Commit Message Box",
+        bounding_box_pct={"x": 0.04, "y": 0.15, "width": 0.18, "height": 0.08},
+        copy_text='Add feature update and error handling'
     )
 ]
 
