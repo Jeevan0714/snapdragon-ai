@@ -165,178 +165,244 @@ class FloatingPillWidget(QtWidgets.QWidget):
         if not query:
             return
         result = route_unified_request(user_input=query, interactive_ui=False)
-        self.show_result_card(result)
+        if result.get("is_scam"):
+            self.show_scam_dialog(result)
+        else:
+            self.show_game_spotlight(result)
 
     def on_check_screen(self):
         fake_test_text = "Windows Defender Alert! Your PC is infected with Trojan! Call 1-800-555-0199 immediately!"
         result = route_unified_request(user_input="check this", screen_text=fake_test_text, interactive_ui=False)
-        self.show_result_card(result)
+        self.show_scam_dialog(result)
 
-    def show_result_card(self, result):
-        """Displays a dedicated non-intrusive floating response dialog with scroll and copy support."""
+    def show_game_spotlight(self, result):
+        """Launches the video-game onboarding spotlight over the target element."""
+        self.spotlight = GameSpotlightOverlay(result)
+        self.spotlight.show()
+
+    def show_scam_dialog(self, result):
+        """Displays the Guardian Alert dialog for threats."""
         dlg = QtWidgets.QDialog(self)
         dlg.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.Tool)
         dlg.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         
-        main_layout = QtWidgets.QVBoxLayout(dlg)
-        main_layout.setContentsMargins(0, 0, 0, 0)
-
-        is_scam = result.get("threat_level") is not None and result.get("is_scam", False)
-        border_color = "#f85149" if is_scam else "#ffd700"
-        
-        # Outer Card Container
-        container = QtWidgets.QFrame()
-        container.setStyleSheet(f"""
-            QFrame#MainCard {{
+        layout = QtWidgets.QVBoxLayout(dlg)
+        frame = QtWidgets.QFrame()
+        frame.setStyleSheet("""
+            QFrame {
                 background-color: #0d1117;
-                border: 2px solid {border_color};
+                border: 2px solid #f85149;
                 border-radius: 16px;
-            }}
+                padding: 16px;
+            }
         """)
-        container.setObjectName("MainCard")
-        c_layout = QtWidgets.QVBoxLayout(container)
-        c_layout.setContentsMargins(20, 18, 20, 16)
-        c_layout.setSpacing(12)
+        f_layout = QtWidgets.QVBoxLayout(frame)
 
-        # Header Title
-        if is_scam:
-            title = QtWidgets.QLabel(f"🛡️ {result['title']}")
-            title.setStyleSheet("color: #ff7b72; font-size: 17px; font-weight: bold; border: none;")
-        else:
-            title = QtWidgets.QLabel(f"💡 {result['step_title']} ({result['app']})")
-            title.setStyleSheet("color: #58a6ff; font-size: 17px; font-weight: bold; border: none;")
-        c_layout.addWidget(title)
+        title = QtWidgets.QLabel(f"🛡️ {result['title']}")
+        title.setStyleSheet("color: #ff7b72; font-size: 17px; font-weight: bold; border: none;")
+        f_layout.addWidget(title)
 
-        # Scrollable content area
-        scroll = QtWidgets.QScrollArea()
-        scroll.setWidgetResizable(True)
-        scroll.setStyleSheet("QScrollArea { border: none; background: transparent; }")
-        
-        content_widget = QtWidgets.QWidget()
-        content_widget.setStyleSheet("background: transparent;")
-        f_layout = QtWidgets.QVBoxLayout(content_widget)
-        f_layout.setContentsMargins(0, 0, 8, 0)
-        f_layout.setSpacing(12)
+        exp = QtWidgets.QLabel(f"<b>Why flagged:</b> {result['explanation']}")
+        exp.setStyleSheet("color: #f0f6fc; font-size: 13px; border: none;")
+        exp.setWordWrap(True)
+        f_layout.addWidget(exp)
 
-        if is_scam:
-            exp_box = QtWidgets.QFrame()
-            exp_box.setStyleSheet("background-color: #161b22; border-radius: 8px; padding: 10px; border: 1px solid #30363d;")
-            exp_l = QtWidgets.QVBoxLayout(exp_box)
-            exp_title = QtWidgets.QLabel("⚠️ Why ScreenSense Flagged This:")
-            exp_title.setStyleSheet("color: #f85149; font-weight: bold; font-size: 13px; border: none;")
-            exp_text = QtWidgets.QLabel(result['explanation'])
-            exp_text.setStyleSheet("color: #f0f6fc; font-size: 13px; line-height: 1.4; border: none;")
-            exp_text.setWordWrap(True)
-            exp_l.addWidget(exp_title)
-            exp_l.addWidget(exp_text)
-            f_layout.addWidget(exp_box)
+        safe = QtWidgets.QLabel(f"<b>Safe Action:</b> {result['safe_action']}")
+        safe.setStyleSheet("color: #7ee787; font-size: 13px; border: none;")
+        safe.setWordWrap(True)
+        f_layout.addWidget(safe)
 
-            safe_box = QtWidgets.QFrame()
-            safe_box.setStyleSheet("background-color: #161b22; border-radius: 8px; padding: 10px; border: 1px solid #238636;")
-            safe_l = QtWidgets.QVBoxLayout(safe_box)
-            safe_title = QtWidgets.QLabel("✅ Recommended Safe Action:")
-            safe_title.setStyleSheet("color: #7ee787; font-weight: bold; font-size: 13px; border: none;")
-            safe_text = QtWidgets.QLabel(result['safe_action'])
-            safe_text.setStyleSheet("color: #e6edf3; font-size: 13px; line-height: 1.4; border: none;")
-            safe_text.setWordWrap(True)
-            safe_l.addWidget(safe_title)
-            safe_l.addWidget(safe_text)
-            f_layout.addWidget(safe_box)
-        else:
-            # Target action
-            target = QtWidgets.QLabel(f"👉 <b>Click Target:</b> <span style='color: #ffd700;'>{result['highlight_target']}</span>")
-            target.setStyleSheet("color: #f0f6fc; font-size: 14px; border: none;")
-            target.setWordWrap(True)
-            f_layout.addWidget(target)
+        footer = QtWidgets.QLabel(f"⚡ Snapdragon NPU: {result.get('npu_latency_ms', 31)} ms  •  100% Private")
+        footer.setStyleSheet("color: #8b949e; font-size: 11px; border: none;")
+        f_layout.addWidget(footer)
 
-            # Instruction
-            inst = QtWidgets.QLabel(result['instruction'])
-            inst.setStyleSheet("color: #c9d1d9; font-size: 13px; line-height: 1.5; border: none;")
-            inst.setWordWrap(True)
-            f_layout.addWidget(inst)
-
-            # Shortcut badge
-            if result.get("shortcut"):
-                sc = QtWidgets.QLabel(f"⌨️ <b>Keyboard Shortcut:</b> <code>{result['shortcut']}</code>")
-                sc.setStyleSheet("color: #7ee787; font-size: 13px; border: none; background-color: #161b22; padding: 6px; border-radius: 6px;")
-                sc.setWordWrap(True)
-                f_layout.addWidget(sc)
-
-            # Copy box (Terminal command / formula)
-            if result.get("copy_text"):
-                copy_box = QtWidgets.QFrame()
-                copy_box.setStyleSheet("background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 8px;")
-                cb_layout = QtWidgets.QHBoxLayout(copy_box)
-                
-                cmd_lbl = QtWidgets.QLabel(result['copy_text'])
-                cmd_lbl.setStyleSheet("color: #79c0ff; font-family: monospace; font-size: 13px; border: none;")
-                cmd_lbl.setWordWrap(True)
-                cb_layout.addWidget(cmd_lbl, 1)
-
-                copy_btn = QtWidgets.QPushButton("📋 Copy")
-                copy_btn.setStyleSheet("""
-                    QPushButton {
-                        background-color: #21262d;
-                        color: #f0f6fc;
-                        border: 1px solid #30363d;
-                        border-radius: 6px;
-                        padding: 5px 12px;
-                        font-weight: bold;
-                    }
-                    QPushButton:hover {
-                        background-color: #30363d;
-                        color: #58a6ff;
-                    }
-                """)
-                def copy_to_clipboard():
-                    QtWidgets.QApplication.clipboard().setText(result['copy_text'])
-                    copy_btn.setText("✓ Copied!")
-                    QtCore.QTimer.singleShot(1500, lambda: copy_btn.setText("📋 Copy"))
-
-                copy_btn.clicked.connect(copy_to_clipboard)
-                cb_layout.addWidget(copy_btn)
-                f_layout.addWidget(copy_box)
-
-        scroll.setWidget(content_widget)
-        c_layout.addWidget(scroll)
-
-        # Footer row with Snapdragon NPU badge and Got It button
-        footer_row = QtWidgets.QHBoxLayout()
-        footer_lbl = QtWidgets.QLabel(f"⚡ Snapdragon Hexagon NPU: {result.get('npu_latency_ms', 31)} ms  •  100% On-Device")
-        footer_lbl.setStyleSheet("color: #8b949e; font-size: 11px; border: none;")
-        footer_row.addWidget(footer_lbl)
-
-        close_btn = QtWidgets.QPushButton("Got It")
+        close_btn = QtWidgets.QPushButton("Dismiss")
         close_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #21262d;
+                color: white;
+                border: 1px solid #30363d;
+                border-radius: 8px;
+                padding: 6px 16px;
+                font-weight: bold;
+            }
+            QPushButton:hover { background-color: #30363d; }
+        """)
+        close_btn.clicked.connect(dlg.accept)
+        f_layout.addWidget(close_btn, alignment=QtCore.Qt.AlignRight)
+
+        layout.addWidget(frame)
+        dlg.resize(600, 220)
+        dlg.move(self.x() + (self.width() - 600) // 2, self.y() + self.height() + 10)
+        dlg.exec_()
+
+class GameSpotlightOverlay(QtWidgets.QWidget):
+    """Full-screen game-style tutorial overlay.
+    
+    Like a video game onboarding walkthrough:
+    - Dims the rest of the screen with a soft cinematic dark mask.
+    - Draws a vibrant golden spotlight box directly around the real target button.
+    - Points a glowing arrow: '👉 CLICK HERE'.
+    - Displays a floating Game Quest Card with instructions, shortcuts, and copy buttons.
+    """
+
+    def __init__(self, result, parent=None):
+        super().__init__(parent)
+        self.result = result
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.Tool)
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+
+        screen = QtWidgets.QApplication.primaryScreen().geometry()
+        self.setGeometry(0, 0, screen.width(), screen.height())
+
+        # Target bounding box in pixels
+        bbox = result.get("bounding_box_pct", {"x": 0.01, "y": 0.16, "width": 0.035, "height": 0.05})
+        self.bx = int(bbox["x"] * screen.width())
+        self.by = int(bbox["y"] * screen.height())
+        self.bw = max(52, int(bbox["width"] * screen.width()))
+        self.bh = max(52, int(bbox["height"] * screen.height()))
+
+        # Add Quest Card HUD
+        self.init_hud(screen)
+
+    def init_hud(self, screen):
+        # Position Quest Card near the highlight box
+        card_w, card_h = 580, 260
+        # If target is on the left edge (like VS Code sidebar), place card to the right of it
+        if self.bx < screen.width() // 2:
+            card_x = min(self.bx + self.bw + 30, screen.width() - card_w - 30)
+            card_y = max(40, min(self.by, screen.height() - card_h - 60))
+        else:
+            card_x = max(30, self.bx - card_w - 30)
+            card_y = max(40, min(self.by, screen.height() - card_h - 60))
+
+        self.hud_frame = QtWidgets.QFrame(self)
+        self.hud_frame.setGeometry(card_x, card_y, card_w, card_h)
+        self.hud_frame.setStyleSheet("""
+            QFrame {
+                background-color: #0d1117;
+                border: 2px solid #ffd700;
+                border-radius: 16px;
+            }
+        """)
+
+        layout = QtWidgets.QVBoxLayout(self.hud_frame)
+        layout.setContentsMargins(20, 16, 20, 16)
+        layout.setSpacing(10)
+
+        # Title / Quest Header
+        title = QtWidgets.QLabel(f"🎮 Step: {self.result['step_title']}", self.hud_frame)
+        title.setStyleSheet("color: #ffd700; font-size: 16px; font-weight: bold; border: none;")
+        layout.addWidget(title)
+
+        # Target pointer
+        target_lbl = QtWidgets.QLabel(f"👉 <b>Target:</b> <span style='color: #58a6ff;'>{self.result['highlight_target']}</span>", self.hud_frame)
+        target_lbl.setStyleSheet("color: #f0f6fc; font-size: 13px; border: none;")
+        layout.addWidget(target_lbl)
+
+        # Instructions
+        inst = QtWidgets.QLabel(self.result['instruction'], self.hud_frame)
+        inst.setStyleSheet("color: #c9d1d9; font-size: 13px; line-height: 1.4; border: none;")
+        inst.setWordWrap(True)
+        layout.addWidget(inst)
+
+        # Shortcut & Copy Command
+        if self.result.get("shortcut"):
+            sc = QtWidgets.QLabel(f"⌨️ <b>Shortcut:</b> <code>{self.result['shortcut']}</code>", self.hud_frame)
+            sc.setStyleSheet("color: #7ee787; font-size: 12px; border: none;")
+            layout.addWidget(sc)
+
+        if self.result.get("copy_text"):
+            cb_box = QtWidgets.QFrame(self.hud_frame)
+            cb_box.setStyleSheet("background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 4px;")
+            cb_l = QtWidgets.QHBoxLayout(cb_box)
+            cmd_lbl = QtWidgets.QLabel(self.result['copy_text'], cb_box)
+            cmd_lbl.setStyleSheet("color: #79c0ff; font-family: monospace; font-size: 12px; border: none;")
+            cb_l.addWidget(cmd_lbl, 1)
+
+            copy_b = QtWidgets.QPushButton("📋 Copy", cb_box)
+            copy_b.setStyleSheet("""
+                QPushButton {
+                    background-color: #21262d;
+                    color: white;
+                    border: 1px solid #30363d;
+                    border-radius: 6px;
+                    padding: 4px 10px;
+                    font-size: 11px;
+                    font-weight: bold;
+                }
+                QPushButton:hover { background-color: #30363d; color: #58a6ff; }
+            """)
+            def do_copy():
+                QtWidgets.QApplication.clipboard().setText(self.result['copy_text'])
+                copy_b.setText("✓ Copied!")
+                QtCore.QTimer.singleShot(1500, lambda: copy_b.setText("📋 Copy"))
+            copy_b.clicked.connect(do_copy)
+            cb_l.addWidget(copy_b)
+            layout.addWidget(cb_box)
+
+        # Bottom Got It Button
+        b_row = QtWidgets.QHBoxLayout()
+        sub_lbl = QtWidgets.QLabel("Press Esc or click button to close", self.hud_frame)
+        sub_lbl.setStyleSheet("color: #8b949e; font-size: 11px; border: none;")
+        b_row.addWidget(sub_lbl)
+
+        got_it = QtWidgets.QPushButton("Got It (Esc)", self.hud_frame)
+        got_it.setStyleSheet("""
             QPushButton {
                 background-color: #238636;
                 color: white;
-                border: none;
-                border-radius: 8px;
-                padding: 6px 20px;
-                font-size: 12px;
                 font-weight: bold;
+                font-size: 12px;
+                border-radius: 8px;
+                padding: 6px 16px;
+                border: none;
             }
-            QPushButton:hover {
-                background-color: #2ea043;
-            }
+            QPushButton:hover { background-color: #2ea043; }
         """)
-        close_btn.clicked.connect(dlg.accept)
-        footer_row.addWidget(close_btn, 0, QtCore.Qt.AlignRight)
+        got_it.clicked.connect(self.close)
+        b_row.addWidget(got_it, 0, QtCore.Qt.AlignRight)
+        layout.addLayout(b_row)
 
-        c_layout.addLayout(footer_row)
-        main_layout.addWidget(container)
+    def paintEvent(self, event):
+        painter = QtGui.QPainter(self)
+        painter.setRenderHint(QtGui.QPainter.Antialiasing)
 
-        # Generous readable sizing
-        card_w = min(680, QtWidgets.QApplication.primaryScreen().geometry().width() - 40)
-        card_h = 360
-        dlg.resize(card_w, card_h)
+        # 1. Soft cinematic dark overlay across entire desktop (like games)
+        overlay_color = QtGui.QColor(10, 15, 25, 140)
+        painter.fillRect(self.rect(), overlay_color)
+
+        # 2. Glowing Golden Spotlight Box around target button
+        # Outer glow
+        glow_pen = QtGui.QPen(QtGui.QColor(255, 215, 0, 90), 8)
+        painter.setPen(glow_pen)
+        painter.setBrush(QtCore.Qt.NoBrush)
+        painter.drawRoundedRect(self.bx - 4, self.by - 4, self.bw + 8, self.bh + 8, 8, 8)
+
+        # Inner sharp golden border
+        sharp_pen = QtGui.QPen(QtGui.QColor(255, 215, 0, 255), 3)
+        painter.setPen(sharp_pen)
+        painter.drawRoundedRect(self.bx, self.by, self.bw, self.bh, 6, 6)
+
+        # 3. Game Pointer Arrow: '👉 CLICK HERE'
+        painter.setPen(QtGui.QColor("#ffd700"))
+        font = QtGui.QFont("Arial", 12, QtGui.QFont.Bold)
+        painter.setFont(font)
         
-        # Position centered below pill
-        pos_x = self.x() + (self.width() - card_w) // 2
-        pos_y = self.y() + self.height() + 12
-        dlg.move(pos_x, pos_y)
-        dlg.exec_()
+        # Position pointer text above or below the box
+        if self.by > 60:
+            painter.drawText(self.bx, self.by - 12, "👉 CLICK HERE")
+        else:
+            painter.drawText(self.bx, self.by + self.bh + 24, "👉 CLICK HERE")
+
+    def keyPressEvent(self, event):
+        if event.key() in (QtCore.Qt.Key_Escape, QtCore.Qt.Key_Return, QtCore.Qt.Key_Space):
+            self.close()
+
+    def mousePressEvent(self, event):
+        # Click outside hud card closes the tutorial spotlight
+        if not self.hud_frame.geometry().contains(event.pos()):
+            self.close()
 
     def summon_widget(self):
         self.show()
