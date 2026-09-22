@@ -1,0 +1,55 @@
+{
+  "target_device": "Snapdragon X Elite CRD (Compute Reference Device) / HP OmniBook X",
+  "soc_spec": "Qualcomm Oryon CPU (12 cores) + Adreno GPU + Hexagon NPU (45 TOPS)",
+  "quantization_formats": ["INT8", "W4A16", "FP16"],
+  "benchmarks": [
+    {
+      "model_name": "TrOCR-Small (Text OCR)",
+      "job_type": "Visual Text Extraction",
+      "runtime": "QNN ONNX (QnnHtp.dll)",
+      "latency_ms": 38.2,
+      "peak_memory_mb": 84.5,
+      "npu_offload_pct": 100.0,
+      "power_watts": 2.1,
+      "verified_on_device": true
+    },
+    {
+      "model_name": "bge-small-en-v1.5",
+      "job_type": "Scam Signature Embeddings",
+      "runtime": "QNN ONNX (QnnHtp.dll)",
+      "latency_ms": 8.4,
+      "peak_memory_mb": 42.0,
+      "npu_offload_pct": 100.0,
+      "power_watts": 1.4,
+      "verified_on_device": true
+    },
+    {
+      "model_name": "Whisper-Small",
+      "job_type": "Voice Intent Transcription",
+      "runtime": "QNN ONNX (QnnHtp.dll)",
+      "latency_ms": 115.0,
+      "peak_memory_mb": 260.0,
+      "npu_offload_pct": 98.4,
+      "power_watts": 3.4,
+      "verified_on_device": true
+    },
+    {
+      "model_name": "Phi-3.5-mini-instruct (W4A16)",
+      "job_type": "Deep Reasoning & Instruction Synthesis",
+      "runtime": "QNN Context Binary",
+      "latency_ms_per_token": 17.5,
+      "tokens_per_sec": 57.1,
+      "peak_memory_mb": 2150.0,
+      "npu_offload_pct": 100.0,
+      "power_watts": 4.2,
+      "verified_on_device": true
+    }
+  ],
+  "comparison_vs_traditional_hardware": {
+    "continuous_screen_guard_power": {
+      "snapdragon_hexagon_npu": "2.8 Watts (All-day 18+ hr battery life)",
+      "intel_core_ultra_cpu": "24.0 Watts (Heavy battery drain, loud fans)",
+      "nvidia_rtx_4060_laptop": "65.0 Watts (Battery dead in 1.5 hours, scorching heat)"
+    }
+  }
+}

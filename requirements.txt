@@ -1,0 +1,13 @@
+# Core Inference & Qualcomm Tooling
+onnxruntime>=1.18.0
+qai-hub>=0.14.0
+
+# Computer Vision & Image Processing
+pillow>=10.0.0
+numpy>=1.24.0
+
+# Desktop UI & Visual Overlay
+# Uses tkinter (standard python built-in) for maximum portability across Linux/Windows/macOS
+
+# Presentation & Pitch Generator
+python-pptx>=0.6.21
