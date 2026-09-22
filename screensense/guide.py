@@ -255,16 +255,30 @@ class ScreenGuide:
         """Resolves natural language questions into visual guidance with exact coordinates."""
         start_time = time.perf_counter()
         query_lower = user_query.lower()
+        # Normalize common user typos and slang
+        normalized_query = query_lower.replace("gith", "git").replace("vsc", "vs code").replace("ppt", "powerpoint").replace("doc", "word")
 
-        # Match intent against knowledge base
+        # 1. Exact phrase / keyword match
         best_match: Optional[GuideAction] = None
         for action in GUIDE_KNOWLEDGE_BASE:
             for kw in action.intent_keywords:
-                if kw in query_lower:
+                if kw in normalized_query or kw in query_lower:
                     best_match = action
                     break
             if best_match:
                 break
+
+        # 2. Flexible keyword overlap match if not found directly
+        if not best_match:
+            query_words = set(normalized_query.split())
+            if "push" in query_words or "pushing" in query_words:
+                best_match = next((a for a in GUIDE_KNOWLEDGE_BASE if "git push" in a.intent_keywords), None)
+            elif "clone" in query_words or "cloning" in query_words:
+                best_match = next((a for a in GUIDE_KNOWLEDGE_BASE if "clone repo" in a.intent_keywords), None)
+            elif "table" in query_words:
+                best_match = next((a for a in GUIDE_KNOWLEDGE_BASE if "table" in a.intent_keywords), None)
+            elif "slide" in query_words or "slides" in query_words:
+                best_match = next((a for a in GUIDE_KNOWLEDGE_BASE if "new slide" in a.intent_keywords), None)
 
         # Simulate NPU latency telemetry
         npu_stats = self.engine.run_fast_sentiment_ocr(user_query)
