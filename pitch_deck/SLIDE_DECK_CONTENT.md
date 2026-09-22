@@ -70,6 +70,10 @@
 
 ### Slide 7: Qualcomm AI Hub Integration & Benchmarks
 * **Target Hardware:** Snapdragon X Elite (CRD) & HP OmniBook X
+* **Live Verified Qualcomm AI Hub Job:**
+  * **Job Name:** `ScreenSense_Sentinel_Threat_Classifier`
+  * **Job ID:** `jp8e10rop`
+  * **Live Dashboard:** [https://workbench.aihub.qualcomm.com/jobs/jp8e10rop/](https://workbench.aihub.qualcomm.com/jobs/jp8e10rop/)
 * **Verified Benchmarks from Qualcomm Cloud Device Farm:**
   * **TrOCR-Small:** 38.2 ms latency | 84 MB RAM | 100% NPU Offload (QNN ONNX)
   * **Phi-3.5-mini (W4A16):** 17.5 ms/tok | 2.1 GB RAM | 100% NPU Offload (QNN Context)

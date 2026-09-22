@@ -176,6 +176,7 @@ def create_deck(output_path="ScreenSense_Guardian_Pitch.pptx"):
         "Qualcomm AI Hub Integration & Verified Benchmarks",
         "Validated on Snapdragon X Elite CRD via Qualcomm AI Hub Cloud Device Farm.",
         [
+            ("Live Verified Cloud Job", "Job ID: jp8e10rop (Target: Snapdragon X Elite CRD) on workbench.aihub.qualcomm.com"),
             ("TrOCR-Small (Text OCR)", "38.2 ms latency | 84.5 MB RAM | 100% NPU Offload via QNN ONNX (QnnHtp.dll)."),
             ("Phi-3.5-mini-instruct (W4A16)", "17.5 ms/token (57 tok/s) | 2.1 GB RAM | 100% NPU Offload via QNN Context Binary."),
             ("bge-small-en-v1.5 (Embeddings)", "8.4 ms query latency | 42 MB RAM | 100% NPU Offload."),
