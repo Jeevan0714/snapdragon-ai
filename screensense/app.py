@@ -166,11 +166,17 @@ def main():
     parser.add_argument("--demo", action="store_true", help="Run the automated scenario demonstration suite")
     parser.add_argument("--gui", action="store_true", help="Launch visual desktop overlay cards during demo")
     parser.add_argument("--interactive", action="store_true", help="Start interactive CLI query loop")
+    parser.add_argument("--widget", action="store_true", help="Launch the floating desktop pill with global hotkey (Alt+Space)")
     args = parser.parse_args()
 
     print_banner()
 
-    if args.interactive:
+    if args.widget:
+        from .desktop_widget import launch_widget
+        print("[ScreenSense] Launching floating desktop widget at the top of your screen...")
+        print("[ScreenSense] Press Alt+Space or click the widget anytime to summon.")
+        launch_widget()
+    elif args.interactive:
         interactive_cli()
     else:
         # Default behavior: run demo suite
