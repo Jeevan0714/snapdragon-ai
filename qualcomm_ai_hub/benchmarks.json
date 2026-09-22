@@ -4,6 +4,19 @@
   "quantization_formats": ["INT8", "W4A16", "FP16"],
   "benchmarks": [
     {
+      "model_name": "ScreenSense Sentinel Threat Classifier",
+      "job_type": "On-Demand Screen Threat Classification (Live Verified)",
+      "runtime": "QNN ONNX (QnnHtp.dll)",
+      "job_id_compile": "jp1n6ykng",
+      "job_id_profile": "jgdd2ey6g",
+      "live_workbench_url": "https://workbench.aihub.qualcomm.com/jobs/jgdd2ey6g/",
+      "latency_microseconds": 31,
+      "latency_ms": 0.031,
+      "peak_memory_mb": 29.1,
+      "npu_offload_pct": 100.0,
+      "status": "SUCCESS (Verified on Physical Hardware)"
+    },
+    {
       "model_name": "TrOCR-Small (Text OCR)",
       "job_type": "Visual Text Extraction",
       "runtime": "QNN ONNX (QnnHtp.dll)",
