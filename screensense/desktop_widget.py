@@ -236,6 +236,24 @@ class FloatingPillWidget(QtWidgets.QWidget):
         dlg.move(self.x() + (self.width() - 600) // 2, self.y() + self.height() + 10)
         dlg.exec_()
 
+    def summon_widget(self):
+        self.show()
+        self.raise_()
+        self.activateWindow()
+        self.query_input.setFocus()
+        self.query_input.selectAll()
+
+    def start_hotkey_listener(self):
+        def on_activate():
+            self.summon_signal.emit()
+
+        hotkey = keyboard.GlobalHotKeys({
+            '<alt>+<space>': on_activate
+        })
+        t = threading.Thread(target=hotkey.start, daemon=True)
+        t.start()
+
+
 class GameSpotlightOverlay(QtWidgets.QWidget):
     """Full-screen game-style tutorial overlay.
     
@@ -403,23 +421,6 @@ class GameSpotlightOverlay(QtWidgets.QWidget):
         # Click outside hud card closes the tutorial spotlight
         if not self.hud_frame.geometry().contains(event.pos()):
             self.close()
-
-    def summon_widget(self):
-        self.show()
-        self.raise_()
-        self.activateWindow()
-        self.query_input.setFocus()
-        self.query_input.selectAll()
-
-    def start_hotkey_listener(self):
-        def on_activate():
-            self.summon_signal.emit()
-
-        hotkey = keyboard.GlobalHotKeys({
-            '<alt>+<space>': on_activate
-        })
-        t = threading.Thread(target=hotkey.start, daemon=True)
-        t.start()
 
 
 def launch_widget():
