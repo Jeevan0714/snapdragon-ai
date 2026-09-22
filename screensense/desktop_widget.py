@@ -173,91 +173,169 @@ class FloatingPillWidget(QtWidgets.QWidget):
         self.show_result_card(result)
 
     def show_result_card(self, result):
-        """Displays a dedicated non-intrusive floating response dialog."""
+        """Displays a dedicated non-intrusive floating response dialog with scroll and copy support."""
         dlg = QtWidgets.QDialog(self)
         dlg.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.Tool)
         dlg.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         
-        d_layout = QtWidgets.QVBoxLayout(dlg)
-        frame = QtWidgets.QFrame()
-        
+        main_layout = QtWidgets.QVBoxLayout(dlg)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+
         is_scam = result.get("threat_level") is not None and result.get("is_scam", False)
         border_color = "#f85149" if is_scam else "#ffd700"
         
-        frame.setStyleSheet(f"""
-            QFrame {{
+        # Outer Card Container
+        container = QtWidgets.QFrame()
+        container.setStyleSheet(f"""
+            QFrame#MainCard {{
                 background-color: #0d1117;
                 border: 2px solid {border_color};
                 border-radius: 16px;
-                padding: 16px;
             }}
         """)
-        f_layout = QtWidgets.QVBoxLayout(frame)
+        container.setObjectName("MainCard")
+        c_layout = QtWidgets.QVBoxLayout(container)
+        c_layout.setContentsMargins(20, 18, 20, 16)
+        c_layout.setSpacing(12)
 
+        # Header Title
         if is_scam:
             title = QtWidgets.QLabel(f"🛡️ {result['title']}")
-            title.setStyleSheet("color: #ff7b72; font-size: 16px; font-weight: bold; border: none;")
-            f_layout.addWidget(title)
-
-            exp = QtWidgets.QLabel(f"<b>Why flagged:</b> {result['explanation']}")
-            exp.setStyleSheet("color: #f0f6fc; font-size: 13px; border: none;")
-            exp.setWordWrap(True)
-            f_layout.addWidget(exp)
-
-            safe = QtWidgets.QLabel(f"<b>Safe Action:</b> {result['safe_action']}")
-            safe.setStyleSheet("color: #7ee787; font-size: 13px; border: none;")
-            safe.setWordWrap(True)
-            f_layout.addWidget(safe)
+            title.setStyleSheet("color: #ff7b72; font-size: 17px; font-weight: bold; border: none;")
         else:
             title = QtWidgets.QLabel(f"💡 {result['step_title']} ({result['app']})")
-            title.setStyleSheet("color: #58a6ff; font-size: 16px; font-weight: bold; border: none;")
-            f_layout.addWidget(title)
+            title.setStyleSheet("color: #58a6ff; font-size: 17px; font-weight: bold; border: none;")
+        c_layout.addWidget(title)
 
-            target = QtWidgets.QLabel(f"👉 <b>Click Target:</b> {result['highlight_target']}")
-            target.setStyleSheet("color: #ffd700; font-size: 14px; font-weight: bold; border: none;")
+        # Scrollable content area
+        scroll = QtWidgets.QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setStyleSheet("QScrollArea { border: none; background: transparent; }")
+        
+        content_widget = QtWidgets.QWidget()
+        content_widget.setStyleSheet("background: transparent;")
+        f_layout = QtWidgets.QVBoxLayout(content_widget)
+        f_layout.setContentsMargins(0, 0, 8, 0)
+        f_layout.setSpacing(12)
+
+        if is_scam:
+            exp_box = QtWidgets.QFrame()
+            exp_box.setStyleSheet("background-color: #161b22; border-radius: 8px; padding: 10px; border: 1px solid #30363d;")
+            exp_l = QtWidgets.QVBoxLayout(exp_box)
+            exp_title = QtWidgets.QLabel("⚠️ Why ScreenSense Flagged This:")
+            exp_title.setStyleSheet("color: #f85149; font-weight: bold; font-size: 13px; border: none;")
+            exp_text = QtWidgets.QLabel(result['explanation'])
+            exp_text.setStyleSheet("color: #f0f6fc; font-size: 13px; line-height: 1.4; border: none;")
+            exp_text.setWordWrap(True)
+            exp_l.addWidget(exp_title)
+            exp_l.addWidget(exp_text)
+            f_layout.addWidget(exp_box)
+
+            safe_box = QtWidgets.QFrame()
+            safe_box.setStyleSheet("background-color: #161b22; border-radius: 8px; padding: 10px; border: 1px solid #238636;")
+            safe_l = QtWidgets.QVBoxLayout(safe_box)
+            safe_title = QtWidgets.QLabel("✅ Recommended Safe Action:")
+            safe_title.setStyleSheet("color: #7ee787; font-weight: bold; font-size: 13px; border: none;")
+            safe_text = QtWidgets.QLabel(result['safe_action'])
+            safe_text.setStyleSheet("color: #e6edf3; font-size: 13px; line-height: 1.4; border: none;")
+            safe_text.setWordWrap(True)
+            safe_l.addWidget(safe_title)
+            safe_l.addWidget(safe_text)
+            f_layout.addWidget(safe_box)
+        else:
+            # Target action
+            target = QtWidgets.QLabel(f"👉 <b>Click Target:</b> <span style='color: #ffd700;'>{result['highlight_target']}</span>")
+            target.setStyleSheet("color: #f0f6fc; font-size: 14px; border: none;")
+            target.setWordWrap(True)
             f_layout.addWidget(target)
 
+            # Instruction
             inst = QtWidgets.QLabel(result['instruction'])
-            inst.setStyleSheet("color: #f0f6fc; font-size: 13px; border: none;")
+            inst.setStyleSheet("color: #c9d1d9; font-size: 13px; line-height: 1.5; border: none;")
             inst.setWordWrap(True)
             f_layout.addWidget(inst)
 
+            # Shortcut badge
             if result.get("shortcut"):
-                sc = QtWidgets.QLabel(f"⌨️ <b>Shortcut:</b> {result['shortcut']}")
-                sc.setStyleSheet("color: #7ee787; font-size: 12px; font-weight: bold; border: none;")
+                sc = QtWidgets.QLabel(f"⌨️ <b>Keyboard Shortcut:</b> <code>{result['shortcut']}</code>")
+                sc.setStyleSheet("color: #7ee787; font-size: 13px; border: none; background-color: #161b22; padding: 6px; border-radius: 6px;")
+                sc.setWordWrap(True)
                 f_layout.addWidget(sc)
 
+            # Copy box (Terminal command / formula)
             if result.get("copy_text"):
-                cp = QtWidgets.QLabel(f"📋 <b>Formula/Command:</b> <code>{result['copy_text']}</code>")
-                cp.setStyleSheet("color: #79c0ff; font-size: 12px; border: none;")
-                f_layout.addWidget(cp)
+                copy_box = QtWidgets.QFrame()
+                copy_box.setStyleSheet("background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 8px;")
+                cb_layout = QtWidgets.QHBoxLayout(copy_box)
+                
+                cmd_lbl = QtWidgets.QLabel(result['copy_text'])
+                cmd_lbl.setStyleSheet("color: #79c0ff; font-family: monospace; font-size: 13px; border: none;")
+                cmd_lbl.setWordWrap(True)
+                cb_layout.addWidget(cmd_lbl, 1)
 
-        footer = QtWidgets.QLabel(f"⚡ Snapdragon NPU: {result.get('npu_latency_ms', 31)} ms  •  Click Close to continue")
-        footer.setStyleSheet("color: #8b949e; font-size: 10px; border: none; margin-top: 8px;")
-        f_layout.addWidget(footer)
+                copy_btn = QtWidgets.QPushButton("📋 Copy")
+                copy_btn.setStyleSheet("""
+                    QPushButton {
+                        background-color: #21262d;
+                        color: #f0f6fc;
+                        border: 1px solid #30363d;
+                        border-radius: 6px;
+                        padding: 5px 12px;
+                        font-weight: bold;
+                    }
+                    QPushButton:hover {
+                        background-color: #30363d;
+                        color: #58a6ff;
+                    }
+                """)
+                def copy_to_clipboard():
+                    QtWidgets.QApplication.clipboard().setText(result['copy_text'])
+                    copy_btn.setText("✓ Copied!")
+                    QtCore.QTimer.singleShot(1500, lambda: copy_btn.setText("📋 Copy"))
 
-        close_b = QtWidgets.QPushButton("Got it")
-        close_b.setStyleSheet("""
+                copy_btn.clicked.connect(copy_to_clipboard)
+                cb_layout.addWidget(copy_btn)
+                f_layout.addWidget(copy_box)
+
+        scroll.setWidget(content_widget)
+        c_layout.addWidget(scroll)
+
+        # Footer row with Snapdragon NPU badge and Got It button
+        footer_row = QtWidgets.QHBoxLayout()
+        footer_lbl = QtWidgets.QLabel(f"⚡ Snapdragon Hexagon NPU: {result.get('npu_latency_ms', 31)} ms  •  100% On-Device")
+        footer_lbl.setStyleSheet("color: #8b949e; font-size: 11px; border: none;")
+        footer_row.addWidget(footer_lbl)
+
+        close_btn = QtWidgets.QPushButton("Got It")
+        close_btn.setStyleSheet("""
             QPushButton {
-                background-color: #21262d;
-                color: #f0f6fc;
-                border: 1px solid #30363d;
+                background-color: #238636;
+                color: white;
+                border: none;
                 border-radius: 8px;
-                padding: 6px 16px;
+                padding: 6px 20px;
+                font-size: 12px;
                 font-weight: bold;
             }
             QPushButton:hover {
-                background-color: #30363d;
+                background-color: #2ea043;
             }
         """)
-        close_b.clicked.connect(dlg.accept)
-        f_layout.addWidget(close_b, alignment=QtCore.Qt.AlignRight)
+        close_btn.clicked.connect(dlg.accept)
+        footer_row.addWidget(close_btn, 0, QtCore.Qt.AlignRight)
 
-        d_layout.addWidget(frame)
-        dlg.resize(580, 240)
+        c_layout.addLayout(footer_row)
+        main_layout.addWidget(container)
+
+        # Generous readable sizing
+        card_w = min(680, QtWidgets.QApplication.primaryScreen().geometry().width() - 40)
+        card_h = 360
+        dlg.resize(card_w, card_h)
         
-        # Position below pill
-        dlg.move(self.x() + (self.width() - 580) // 2, self.y() + self.height() + 10)
+        # Position centered below pill
+        pos_x = self.x() + (self.width() - card_w) // 2
+        pos_y = self.y() + self.height() + 12
+        dlg.move(pos_x, pos_y)
         dlg.exec_()
 
     def summon_widget(self):

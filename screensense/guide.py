@@ -224,6 +224,16 @@ GUIDE_KNOWLEDGE_BASE: List[GuideAction] = [
         shortcut="Ctrl + Shift + P -> 'Git: Clone'"
     ),
     GuideAction(
+        intent_keywords=["git push", "push to github", "push code", "upload to github", "how to git push"],
+        app_context="Git / VS Code",
+        step_title="Pushing Your Code to GitHub",
+        instruction="In VS Code, click the Source Control icon (the branch graph) on the left sidebar and click 'Sync Changes' (or 'Push'). Or paste this command into your terminal to upload your latest commits:",
+        highlight_target="Activity Bar: Source Control (Left Sidebar) -> Push",
+        bounding_box_pct={"x": 0.01, "y": 0.20, "width": 0.03, "height": 0.04},
+        shortcut="Ctrl + Shift + G (Opens Source Control in VS Code)",
+        copy_text="git push -u origin main"
+    ),
+    GuideAction(
         intent_keywords=["commit message", "what should my commit message be", "suggest commit message"],
         app_context="Git / GitHub",
         step_title="Crafting a Clear Commit Message",
