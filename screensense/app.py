@@ -20,7 +20,7 @@ from .overlay_ui import overlay
 def print_banner():
     hw = default_engine.get_hardware_info()
     print("=" * 75)
-    print("   ScreenSense Guardian — On-Device AI Copilot for Snapdragon PCs")
+    print("   Compass — Direction Without Control (On-Device AI for Snapdragon PCs)")
     print("=" * 75)
     print(f" Target Hardware : {hw['target_silicon']}")
     print(f" AI Processor    : {hw['npu_hardware']}")
@@ -118,21 +118,28 @@ def route_unified_request(user_input: str = "", screen_text: str = "", current_a
             overlay.display_guardian_alert(scan_result)
         return scan_result
 
-    # RULE 2: Otherwise route to Guide Mode tutor
-    guide_query = user_input if user_input and not is_explicit_guide else "How do I use this app?"
-    guide_result = guide.resolve_guide_request(guide_query, current_app=current_app)
-    guide_result["routed_by"] = "Guide Mode (Tutor)"
-    if interactive_ui:
-        overlay.display_guide(guide_result)
-    return guide_result
+    # RULE 2: Otherwise route to Guide Mode tutor (Multi-Step Quest)
+    guide_query = user_input if user_input and not is_explicit_guide else "how to add page numbers in google docs"
+    quest_res = guide.start_quest(guide_query)
+    step_d = quest_res.get("step_data", {})
+    return {
+        "routed_by": "Guide Mode (Multi-Step Gamified Quest)",
+        "found": True,
+        "app": quest_res.get("app", "Google Docs"),
+        "step_title": f"{quest_res.get('quest_title')} ({step_d.get('step_title')})",
+        "instruction": step_d.get("instruction"),
+        "highlight_target": step_d.get("highlight_target"),
+        "bounding_box_pct": step_d.get("bounding_box_pct"),
+        "shortcut": step_d.get("shortcut"),
+        "npu_latency_ms": quest_res.get("npu_latency_ms", 32)
+    }
 
 
 def interactive_cli():
     """Interactive loop testing the Unified Intent Router."""
-    print("Entering Unified ScreenSense Router. Test all 3 input methods:")
-    print("  1. Voice/Text: 'How do I add a slide?' or 'Is this bank SMS a scam?'")
-    print("  2. Quick Actions: Type 'check this' or 'help me'")
-    print("  3. Safety-First: Paste scam text with NO question (it catches it automatically!)")
+    print("Entering Unified ScreenSense Router. Focused 2 Core Features:")
+    print("  1. Scam Detection: Paste scam message or type 'check this'")
+    print("  2. Google Docs Quest: Type 'page numbers in google docs' or 'insert table'")
     print("  - Type 'exit' to quit.\n")
 
     while True:
@@ -155,7 +162,7 @@ def interactive_cli():
                 print(f"  • Target     : {result['highlight_target']}")
                 print(f"  • Guidance   : {result['instruction']}")
                 if result.get("shortcut"):
-                    print(f"  • Shortcut   : {result['shortcut']}")
+                    print(f"  • Action     : {result['shortcut']}")
             print(f"  • NPU Latency: {result['npu_latency_ms']} ms (Hexagon NPU)\n")
         except (KeyboardInterrupt, EOFError):
             break

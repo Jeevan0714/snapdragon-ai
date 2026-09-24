@@ -1,3 +1,4 @@
+
 """Export ScreenSense Sentinel Classifier to ONNX and submit live compile job to Qualcomm AI Hub.
 Target Hardware: Snapdragon X Elite CRD (Qualcomm Hexagon NPU).
 """
@@ -31,7 +32,7 @@ def create_screensense_sentinel_onnx(output_path="screensense_sentinel.onnx"):
     relu_node = helper.make_node('Relu', ['h1'], ['h1_relu'])
     gemm2_node = helper.make_node('Gemm', ['h1_relu', 'W2', 'B2'], ['threat_logits'], alpha=1.0, beta=1.0)
 
-    # Graph & Model
+    # Graph & Model with ir_version=10 for Qualcomm AI Hub compatibility
     graph = helper.make_graph(
         [gemm1_node, relu_node, gemm2_node],
         'ScreenSense_Sentinel',
@@ -40,9 +41,17 @@ def create_screensense_sentinel_onnx(output_path="screensense_sentinel.onnx"):
         [w1_tensor, b1_tensor, w2_tensor, b2_tensor]
     )
 
-    model = helper.make_model(graph, producer_name='ScreenSense_AI')
+    model = helper.make_model(
+        graph,
+        producer_name='ScreenSense_AI',
+        ir_version=10,
+        opset_imports=[helper.make_opsetid("", 17)]
+    )
+    
+    # Verify model with ONNX checker
+    onnx.checker.check_model(model, full_check=True)
     onnx.save(model, output_path)
-    print(f"Generated ONNX model: {output_path}")
+    print(f"Generated ONNX model (IR v10, Opset 17): {output_path}")
     return output_path
 
 

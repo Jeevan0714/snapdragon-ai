@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Compass
+Comment=Direction Without Control — On-Device AI Copilot for Snapdragon PCs
+Exec="/home/jeevan/Desktop/my projects/snapdragon-ai/launch_screensense.sh"
+Path=/home/jeevan/Desktop/my projects/snapdragon-ai
+Icon=security-high
+Terminal=false
+Categories=Utility;Security;Settings;
+StartupNotify=true

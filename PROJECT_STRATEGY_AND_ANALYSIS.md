@@ -1,9 +1,8 @@
-# ScreenSense Guardian — Strategic Project Dossier & Evaluation Analysis
+# Compass — Direction Without Control (Strategic Architectural Analysis)
 
 > **Target Challenge:** Snapdragon® AI Lab Build & Present Challenge (Qualcomm & HP)  
 > **Platform Target:** Snapdragon X Elite / Snapdragon X Plus (Windows on ARM)  
 > **Evaluation Rubric:** 100 Points (Technical Implementation, Innovation & Use Case, Deployment & Accessibility, Presentation & Documentation)  
-> **Project Rating:** **9.5 / 10** (Refined from 8.8 by addressing latency SLAs, Windows UIA coordinate grounding, and ephemeral memory architectures)
 
 ---
 
@@ -11,11 +10,11 @@
 
 Technology evolves at a pace that assumes the user was born with a smartphone in hand. For over **1.2 billion users aged 40+ and seniors globally**, the digital landscape has transformed into a minefield:
 
-1. **The Fear of "Breaking Something":** Non-digital natives hesitate to explore software (Word, Excel, PowerPoint, GitHub, or government portals) because error messages are cryptic and interfaces change without warning.
+1. **The Fear of "Breaking Something":** Non-digital natives hesitate to explore software (Google Docs, Word, Excel, PowerPoint, GitHub, or government portals) because error messages are cryptic and interfaces change without warning.
 2. **The Multi-Billion Dollar Scam Epidemic:** According to FBI IC3 data, adults over 40 lose more than **$3.4 Billion annually** to tech support scams, phishing pop-ups (*"Your PC is infected! Call Microsoft at 1-800..."*), and OTP social-engineering attacks.
 3. **The Embarrassment of Asking for Help:** 40+ professionals and elderly relatives often suffer in silence or spend hours watching outdated, ad-riddled YouTube tutorials because they feel embarrassed asking family members for the tenth time how to attach a file or format a table.
 
-**ScreenSense Guardian** is the private, on-device AI layer that bridges this gap. Operating silently on the **Qualcomm Hexagon NPU**, it provides **Guide Mode** (a patient visual tutor that highlights exactly where to click) and **Guardian Mode** (an ambient shield that intercepts visual scams in real time) — completely offline, with zero cloud dependency and zero battery drain.
+**Compass** is the 100% local, on-device AI copilot that bridges this gap. Operating on the **Qualcomm Hexagon NPU**, it provides **Guide Mode** (a patient visual tutor that highlights exactly where to click) and **Guardian Mode** (an ambient shield that intercepts visual scams in real time) — 100% offline and local, with zero cloud dependency and zero battery drain.
 
 ---
 
