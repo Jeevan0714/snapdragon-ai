@@ -56,6 +56,14 @@ The user typed **"how to add page numbers to these"** while working in Google Do
   <img src="docs/screenshots/guide_mode_quest_complete.png" alt="Guide Mode Quest Complete — Step 5 of 5" width="700"/>
 </p>
 
+**Below: Guide HUD Components — Floating Stepper Card & Quest Complete Card**
+
+<p align="center">
+  <img src="docs/screenshots/guide_mode_stepper.png" alt="Guide Mode Stepper Card" width="460"/>
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/guide_quest_complete_card.png" alt="Guide Quest Complete Card" width="460"/>
+</p>
+
 > 💡 **Key Design Principle — "Show, Don't Do":** Compass never runs commands or clicks buttons for you. It **shows** you exactly where to click, what to type, and what to copy — one step at a time. You stay in control. You learn while doing.
 
 ---
@@ -72,6 +80,14 @@ Notice three things in this screenshot:
 1. **The floating Compass bar** at the top shows the Voice input mode is active (*"🎙️ Listening... Speak your question now!"*)
 2. **The Guardian Alert card** on the right displays the threat category, explanation of *why* it was flagged, and a clear **Safe Action** telling the user what to do
 3. **NPU footer** shows: `⚡ Hexagon NPU: 38.09 ms • 100% On-Device & Private`
+
+**Below: Screen Verified Safe (No Threat Detected)**
+
+When Guardian scans a normal, safe screen, it provides immediate peace of mind with a verified green status:
+
+<p align="center">
+  <img src="docs/screenshots/guardian_safe_verified.png" alt="Guardian Mode: Screen Verified Safe" width="500"/>
+</p>
 
 ---
 
